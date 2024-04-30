@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Scraper by João Pedro Machado Moura</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      /* I used amazon's background color(I think it's this one) */
+      background-color: #333c4c;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background-color: #f0c140;
+      color: white;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #e0b131;
+    }
+   .results {
+      margin-top: 2rem;
+    }
+   .product {
+      border-bottom: 1px solid #ccc;
+      padding: 1rem 0;
+    }
+   .product:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Amazon Scraper</h1>
+  <input type="text" id="keyword" placeholder="Enter keyword">
+  <button id="scrape-btn">Scrape</button>
+  <div class="results">
+    <!-- Results will be displayed here -->
+  </div>
+
+  <script>
+    //setting some variables
+    const scrapeBtn = document.getElementById('scrape-btn');
+    const keywordInput = document.getElementById('keyword');
+    const resultsDiv = document.querySelector('.results');
+
+    scrapeBtn.addEventListener('click', async () => {
+      const keyword = keywordInput.value.trim();
+      // Checking if the keyword is not empty
+      if (keyword) {
+        try {
+        // Fetching data from the API endpoint with the keyword as a query parameter
+          const response = await fetch(`/api/scrape?keyword=${keyword}`);
+          const data = await response.json();
+          // Mapping over the product data and create HTML elements for each product
+          const resultsHtml = data.map((product) => {
+            return `
+              <div class="product">
+                <h2>${product.title}</h2>
+                <p>Rating: ${product.rating} out of 5 stars</p>
+                <p>Reviews: ${product.reviewCount}</p>
+                <img src="${product.imageUrl}" alt="Product image">
+              </div>
+            `;
+          }).join('');
+          resultsDiv.innerHTML = resultsHtml;
+        } catch (error) {
+          console.error(error);
+          resultsDiv.innerHTML = '<p>Error scraping Amazon</p>';
+        }
+      } else {
+        resultsDiv.innerHTML = '<p>Please enter a keyword</p>';
+      }//error messages
+    });
+  </script>
+</body>
+</html>
